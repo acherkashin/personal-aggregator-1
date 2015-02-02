@@ -5,6 +5,9 @@ Personal information aggregator
 
 Fast access to a lot of information sources
 
+###Timeline
+The project should be released by 28th February
+
 
 ###The project consists of several services:
 
