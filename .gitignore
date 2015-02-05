@@ -19,8 +19,6 @@ project/plugins/project/
 /target
 /classes
 /checkouts
-pom.xml
-pom.xml.asc
 *.jar
 *.class
 /.lein-*
