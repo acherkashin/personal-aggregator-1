@@ -3,6 +3,8 @@
             [frontend.views.layout :as layout]
             [hiccup.form :refer :all]))
 
+(def snippet "Here'll be short snippets for RSS data. Here'll be short snippets for RSS data. Here'll be short snippets for RSS data. Here'll be short snippets for RSS data. Here'll be short snippets for RSS data.Here'll be short snippets for RSS data.Here'll be short snippets for RSS data.Here'll be short snippets for RSS data.")
+
 (defn home []
   (layout/common
     (hiccup.form/form-to [:post "/"]
@@ -19,10 +21,11 @@
     [:ol
      (for [result results]
        [:li 
-         [:a {:href (:url result)} (:title result)]])]))
+        [:a {:href (:url result)} (:title result)]
+        [:p (:snippet result)]])]))
 
 (defn- search [query]
-  [{:url "http://github.com" :title "Github"} {:url "http://twitter.com" :title "Twitter"}])
+  [{:url "http://github.com" :title "Github" :snippet snippet} {:url "http://twitter.com" :title "Twitter" :snippet snippet}])
 
 (defroutes home-routes
            (GET "/" [] (home))
