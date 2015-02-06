@@ -9,6 +9,8 @@
   :ring {:handler frontend.handler/app
          :init frontend.handler/init
          :destroy frontend.handler/destroy}
+  :main ^:skip-aot frontend.handler
+  :uberjar-name "frontend.jar"
   :profiles
   {:uberjar {:aot :all}
    :production
