@@ -27,3 +27,4 @@ project/plugins/project/
 server.iml
 .DS_Store
 .DS_Store?
+.lein-failures
