@@ -1,5 +1,6 @@
 (ns frontend.routes.home
   (:require [compojure.core :refer :all]
+            [clj-time.format :as clj-format]
             [frontend.views.layout :as layout]
             [cheshire.core :refer :all]
             [clj-http.client :as client]
@@ -7,8 +8,11 @@
 
 (def url "http://localhost:3000/search")
 
+(def display-formatter (clj-format/formatter "dd.MM.yyyy HH:mm"))
+
 (defn- format-time-string [s]
-  s)
+  (let [time (clj-format/parse s)]
+    (clj-format/unparse display-formatter time)))
 
 (defn home []
   (layout/common
