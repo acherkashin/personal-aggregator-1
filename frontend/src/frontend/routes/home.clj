@@ -1,9 +1,14 @@
 (ns frontend.routes.home
   (:require [compojure.core :refer :all]
             [frontend.views.layout :as layout]
+            [cheshire.core :refer :all]
+            [clj-http.client :as client]
             [hiccup.form :refer :all]))
 
-(def snippet "Here'll be short snippets for RSS data. Here'll be short snippets for RSS data. Here'll be short snippets for RSS data. Here'll be short snippets for RSS data. Here'll be short snippets for RSS data.Here'll be short snippets for RSS data.Here'll be short snippets for RSS data.Here'll be short snippets for RSS data.")
+(def url "http://localhost:3000/search")
+
+(defn- format-time-string [s]
+  s)
 
 (defn home []
   (layout/common
@@ -18,14 +23,19 @@
   (layout/common
     [:h3 (str "You've asked for: " query)]
     [:h3 "Search results:"]
-    [:ol
-     (for [result results]
-       [:li 
-        [:a {:href (:url result)} (:title result)]
-        [:p (:snippet result)]])]))
+    (if (= (count results) 0)
+      [:p "Sorry, we haven't find anything"]
+      [:ol
+       (for [result results]
+         [:li 
+          [:a {:href (:url result)} (:title result)]
+          [:p (format-time-string (:time result))]
+          [:p (:snippet result)]])])))
 
 (defn- search [query]
-  [{:url "http://github.com" :title "Github" :snippet snippet} {:url "http://twitter.com" :title "Twitter" :snippet snippet}])
+  (let [obj {:keywords query}]
+    (let [results (client/get url {:query-params obj})]
+      (decode (:body results) true))))
 
 (defroutes home-routes
            (GET "/" [] (home))

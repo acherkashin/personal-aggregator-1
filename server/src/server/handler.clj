@@ -13,6 +13,7 @@
 (def media-types ["application/json"])
 
 (defn parse-json [ctx] (-> ctx :request :body slurp (decode true)))
+(defn parse-query [ctx] (-> ctx :request :query-params (clojure.walk/keywordize-keys)))
 
 (defresource version []
   :available-media-types media-types
@@ -25,10 +26,10 @@
              :handle-created ::status)
 
 (defresource search []
-             :allowed-methods [:post :options]
+             :allowed-methods [:get :options]
              :available-media-types media-types
-             :post!     (fn [ctx] {::results (indexer/search (parse-json ctx))})
-             :handle-created ::results)
+             :exists?     (fn [ctx] {::results (indexer/search (parse-query ctx))})
+             :handle-ok ::results)
 
 (defresource not-found []
              :allowed-methods [:get :post :put :delete :option]
@@ -52,7 +53,7 @@
           (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control")))))
 
 (def application (-> routes  
-                     ;(wrap-trace :header :ui);it can cause problems with headers
+                     ;(wrap-trace :header :ui);it can cause problems with big data
                      wrap-params 
                      allow-cross-origin))
 

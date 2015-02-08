@@ -3,8 +3,10 @@
   :url "http://example.com/FIXME"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.1.6"]
+                 [cheshire "5.4.0"]
                  [hiccup "1.0.5"]
-                 [ring-server "0.3.1"]]
+                 [ring-server "0.3.1"]
+                 [clj-http "1.0.1"]]
   :plugins [[lein-ring "0.8.12"]]
   :ring {:handler frontend.handler/app
          :init frontend.handler/init
