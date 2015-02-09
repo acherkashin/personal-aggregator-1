@@ -17,18 +17,30 @@
            :url "http://twitter.com"
            :snippet "It is used for access to a lot of actual information.\n Try this site."
            :time (str (clj-time/now))})
+(def doc3 {:title "Третий документ"
+           :url "http://concert.ru"
+           :snippet "Все интересные события"
+           :time (str (clj-time/now))})
 
 (deftest test-app
   (indexer/delete-all)
   (indexer/insert doc1)
   (indexer/insert doc2)
+  (indexer/insert doc3)
 
-  (testing "search by phrase"
+  (testing "search by English phrase"
     (let [response (application (mock/request :get "/search" {:keywords "first"}))]
       (is (= (:status response) 200))
       (let [results (get-json-body response)]
         (is (= (count results) 1))
         (is (= (first results) doc1)))))
+
+  (testing "search by Russian phrase"
+    (let [response (application (mock/request :get "/search" {:keywords "Третий"}))]
+      (is (= (:status response) 200))
+      (let [results (get-json-body response)]
+        (is (= (count results) 1))
+        (is (= (first results) doc3)))))
 
   (testing "empty result"
     (let [response (application (mock/request :get "/search" {:keywords "unknown"}))]
