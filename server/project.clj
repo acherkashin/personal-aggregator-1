@@ -9,7 +9,8 @@
                  [compojure "1.3.1"]
                  [liberator "0.12.2"]
                  [cheshire "5.4.0"]
-                 [clj-time "0.9.0"]]
+                 [clj-time "0.9.0"]
+                 [com.novemberain/monger "2.0.0"]]
   :plugins [[lein-ring "0.8.13"]]
 
   :ring {:handler server.handler/application}

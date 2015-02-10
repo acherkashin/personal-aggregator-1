@@ -39,6 +39,28 @@
 (defn- insert-ru [doc]
   (clucy/add index-ru doc))
 
+(defn- check-required-fields [doc]
+  (if (= (:url doc) nil)
+    (throw (Exception. "You must define field :url"))
+    (if (= (:title doc) nil)
+      (throw (Exception. "You must define field :title"))
+      (if (= (:snippet doc) nil)
+        (throw (Exception. "You must define field :snippet"))
+        (if (= (:time doc) nil)
+          (throw (Exception. "You must define field :time"))
+          nil)))))
+
+(defn- insert- [index doc]
+  (check-required-fields doc)
+  (clucy/add index
+             (with-meta doc
+               {:url {:stored true
+                      :indexed false
+                      :analyzed false}
+                :time {:stored true
+                       :indexed false
+                       :analyzed false}})))
+
 (defn delete-all []
   (delete-directory path-en)
   (delete-directory path-ru)
@@ -48,9 +70,9 @@
 (defn insert [doc]
   (let [text (str (:title doc) " " (:snippet doc)) lang (detect-lang text)]
     (if (= lang "en")
-      (insert-en doc)
+      (insert- index-en doc)
       (if (= lang "ru")
-        (insert-ru doc)
+        (insert- index-ru doc)
         (throw (Exception. (str "Language " lang " is not supported")))))))
 
 (defn- search-en [query max]
@@ -58,14 +80,6 @@
 
 (defn- search-ru [query max]
   (clucy/search index-ru query max))
-
-;; (defn search [lang obj]
-;;   (let [query (:keywords obj) max 10]
-;;      (if (= lang "en")
-;;        (search-en query max)
-;;        (if (= lang "ru")
-;;          (search-ru query max)
-;;          (throw (Exception. (str "Language " lang " is not supported")))))))
 
 (defn search [obj]
   (let [query (:keywords obj) max 10]
