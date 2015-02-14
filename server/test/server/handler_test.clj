@@ -11,7 +11,7 @@
   (testing "main route"
     (let [response (application (mock/request :get "/"))]
       (is (= (:status response) 200))
-      (is (= (get-json-body response) {:version 0.1}))))
+      (is (= (get-json-body response) {:version 0.2}))))
   
   (testing "not-found route"
     (let [response (application (mock/request :get "/invalid"))]

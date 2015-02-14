@@ -1,6 +1,7 @@
 *.class
 *.log
-
+*.clj#
+*.clj~
 # sbt specific
 .cache/
 .history/
@@ -15,7 +16,7 @@ project/plugins/project/
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
-
+settings.txt
 /target
 /classes
 /checkouts

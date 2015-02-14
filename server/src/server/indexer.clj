@@ -1,7 +1,11 @@
 (ns server.indexer
   (import org.apache.lucene.analysis.en.EnglishAnalyzer)
   (import org.apache.lucene.analysis.ru.RussianAnalyzer)
-  (:require [clucy.core :as clucy]))
+  (:require [clucy.core :as clucy]
+            [ring.util.codec :as codec]
+            [clj-time.core :as clj-time]
+            [clj-time.coerce :as coerce]
+            [server.docs :as docs]))
 
 (def path-en "/tmp/news_en")
 (def path-ru "/tmp/news_ru")
@@ -33,18 +37,12 @@
       (safe-delete (.getPath file)))
     (safe-delete directory-path)))
 
-(defn- insert-en [doc]
-  (clucy/add index-en doc))
-
-(defn- insert-ru [doc]
-  (clucy/add index-ru doc))
-
 (defn- check-required-fields [doc]
   (if (= (:url doc) nil)
     (throw (Exception. "You must define field :url"))
     (if (= (:title doc) nil)
       (throw (Exception. "You must define field :title"))
-      (if (= (:snippet doc) nil)
+     (if (= (:snippet doc) nil)
         (throw (Exception. "You must define field :snippet"))
         (if (= (:time doc) nil)
           (throw (Exception. "You must define field :time"))
@@ -54,25 +52,32 @@
   (check-required-fields doc)
   (clucy/add index
              (with-meta doc
-               {:url {:stored true
-                      :indexed false
+               {:id {:stored true
+                     :indexed true
+                     :analyzed false}
+                :url {:stored true
+                      :indexed true
                       :analyzed false}
                 :time {:stored true
                        :indexed false
                        :analyzed false}})))
 
 (defn delete-all []
+  (docs/delete-all)
   (delete-directory path-en)
   (delete-directory path-ru)
-  (insert-en {:title "" :url ""})
-  (insert-ru {:title "" :url ""}))
+  (insert- index-en {:title "" :url "" :snippet "" :time ""})
+  (insert- index-ru {:title "" :url "" :snippet "" :time ""}))
 
 (defn insert [doc]
-  (let [text (str (:title doc) " " (:snippet doc)) lang (detect-lang text)]
+  (let [id (docs/insert-doc doc)
+        text (str (:title doc) " " (:snippet doc))
+        lang (detect-lang text)
+        time (str (:time doc))]
     (if (= lang "en")
-      (insert- index-en doc)
+      (insert- index-en (assoc doc :id id))
       (if (= lang "ru")
-        (insert- index-ru doc)
+        (insert- index-ru (assoc doc :id id))
         (throw (Exception. (str "Language " lang " is not supported")))))))
 
 (defn- search-en [query max]
@@ -85,3 +90,6 @@
   (let [query (:keywords obj) max 10]
     (let [en-results (search-en query max) ru-results (search-ru query max)]
       (concat en-results ru-results))))
+
+(defn exists [url]
+  (docs/exists url))

@@ -7,7 +7,12 @@
             [liberator.core :refer [resource defresource]]
             [liberator.dev :refer [wrap-trace]]
             [cheshire.core :refer :all]
-            [server.indexer :as indexer])
+            [clj-time.core :as clj-time]
+            [clj-time.format :as clj-format]
+            [clj-time.coerce :as coerce]
+            [server.indexer :as indexer]
+            [server.ddl :as ddl]
+            [server.docs :as docs])
   (:gen-class))
 
 (def media-types ["application/json"])
@@ -17,12 +22,16 @@
 
 (defresource version []
   :available-media-types media-types
-  :handle-ok {:version 0.1})
+  :handle-ok {:version 0.2})
 
 (defresource insert-document []
              :allowed-methods [:post :options]
              :available-media-types media-types
-             :post!     (fn [ctx] {::status (indexer/insert (parse-json ctx))})
+             :post!     (fn [ctx] (let [doc (parse-json ctx)]
+                                    (if (docs/exists (:url doc))
+                                      {::status (indexer/insert
+                                                 (assoc doc :time (clj-format/parse (:time doc))))}
+                                      {::status "exists"})))
              :handle-created ::status)
 
 (defresource search []
@@ -57,10 +66,16 @@
                      wrap-params 
                      allow-cross-origin))
 
-(defn start [port]
+(defn- start [port]
   (jetty/run-jetty #'application {:port port :join? false}))
-
 
 (defn -main [& args]
   (println "starting...")
-  (start 3000))
+  (if-let [option (first args)]
+    (if (= option "create-db")
+      (do
+        (ddl/drop-schema)
+        (ddl/create-schema)
+        (ddl/create-tables)
+        (println "A database was created")))
+    (start 3000)))

@@ -6,11 +6,13 @@
                  [clucy "0.4.0"]
                  [ring "1.3.2"]
                  [ring-cors "0.1.5"]
+                 [ring/ring-codec "1.0.0"]
                  [compojure "1.3.1"]
                  [liberator "0.12.2"]
                  [cheshire "5.4.0"]
                  [clj-time "0.9.0"]
-                 [com.novemberain/monger "2.0.0"]]
+                 [korma "0.4.0"]
+                 [org.postgresql/postgresql "9.2-1002-jdbc4"]]
   :plugins [[lein-ring "0.8.13"]]
 
   :ring {:handler server.handler/application}
