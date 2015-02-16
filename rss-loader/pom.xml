@@ -26,6 +26,16 @@
             <scope>compile</scope>
             <optional>true</optional><!-- mandatory in Scala -->
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>rome</groupId>
+            <artifactId>rome</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -82,7 +92,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Starter</mainClass>
+                            <mainClass>ScalaRSSParse</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
