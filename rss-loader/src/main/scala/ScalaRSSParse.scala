@@ -1,5 +1,7 @@
 import java.io.{FileReader, BufferedReader, File, PrintWriter}
 
+import org.apache.log4j.BasicConfigurator
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
@@ -42,6 +44,7 @@ object ScalaRSSParse {
         updateFile("Error.log","Ошибка обновления "+(new DateTime().toString)+ ". Адресс сайта: " + arrayURL(i).toString)
       mapWebSites += ( url.toString -> collection._2 )
     }
+    println("Обновление заверншено.")
     (mapWebSites)
   }
 
@@ -66,8 +69,15 @@ object ScalaRSSParse {
       }
       if (arrayPlus._2) {
         for (i <- 0 until arrayArticle.length)
-          if (!oldMap.contains(arrayArticle(i).url.toString))
-            println(arrayArticle(i).toString)
+          if (!oldMap.contains(arrayArticle(i).url.toString)) {
+            //отправка на сервер
+            BasicConfigurator.configure
+            val  workWithServer = new WorkWithServer()
+            val arrayJSON = workWithServer.CreateArrayJSONFile(arrayArticle)
+            for( i <- 0 until arrayJSON.length)
+              workWithServer.PostRequest(arrayJSON(i))
+            println("отправлено")
+          }
         (true, mapArticle)
       }
       else {
