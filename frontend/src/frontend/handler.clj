@@ -29,4 +29,4 @@
 
 (defn -main [& args]
   (println "starting web server...")
-  (start 4000))
+  (start 80))

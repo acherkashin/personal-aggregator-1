@@ -7,8 +7,8 @@
             [clj-time.coerce :as coerce]
             [server.docs :as docs]))
 
-(def path-en "/tmp/news_en")
-(def path-ru "/tmp/news_ru")
+(def path-en "./news_en")
+(def path-ru "./news_ru")
 
 (def index-en (clucy/disk-index path-en))
 (def index-ru (clucy/disk-index path-ru))

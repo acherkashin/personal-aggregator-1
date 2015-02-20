@@ -77,5 +77,6 @@
         (ddl/drop-schema)
         (ddl/create-schema)
         (ddl/create-tables)
+        (indexer/delete-all)
         (println "A database was created")))
     (start 3000)))
