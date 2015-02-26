@@ -15,23 +15,30 @@
             [server.docs :as docs])
   (:gen-class))
 
-(def media-types ["application/json"])
+(def ^:private media-types ["application/json"])
 
-(defn parse-json [ctx] (-> ctx :request :body slurp (decode true)))
-(defn parse-query [ctx] (-> ctx :request :query-params (clojure.walk/keywordize-keys)))
+(defn- parse-json [ctx] (-> ctx :request :body slurp (decode true)))
+(defn- parse-query [ctx] (-> ctx :request :query-params (clojure.walk/keywordize-keys)))
 
 (defresource version []
+  :allowed-methods [:get]
   :available-media-types media-types
   :handle-ok {:version 0.2})
+
+(defn- insert-doc [doc]
+  (let [url (:url doc) exists (docs/exists url)]
+    {::status (if exists
+                "exists"
+                (do
+                  (indexer/insert (assoc doc :time (clj-format/parse (:time doc))))
+                  "ok"))}))
 
 (defresource insert-document []
              :allowed-methods [:post :options]
              :available-media-types media-types
-             :post!     (fn [ctx] (let [doc (parse-json ctx)]
-                                    (if (docs/exists (:url doc))
-                                      {::status (indexer/insert
-                                                 (assoc doc :time (clj-format/parse (:time doc))))}
-                                      {::status "exists"})))
+             :post!     (fn [ctx]
+                          (let [doc (parse-json ctx)]
+                            (insert-doc doc)))
              :handle-created ::status)
 
 (defresource search []
@@ -52,7 +59,7 @@
   (ANY "/search" [] (search))
   (ANY "*" [] (not-found)))
 
-(defn allow-cross-origin
+(defn- allow-cross-origin
   [handler]
   (fn [request]
     (let [response (handler request)]
