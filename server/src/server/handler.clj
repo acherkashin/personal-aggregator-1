@@ -10,6 +10,7 @@
             [clj-time.core :as clj-time]
             [clj-time.format :as clj-format]
             [clj-time.coerce :as coerce]
+            [server.parsers :as parsers]
             [server.indexer :as indexer]
             [server.ddl :as ddl]
             [server.docs :as docs])
@@ -29,9 +30,11 @@
   (let [url (:url doc) exists (docs/exists url)]
     {::status (if exists
                 "exists"
-                (do
-                  (indexer/insert (assoc doc :time (clj-format/parse (:time doc))))
-                  "ok"))}))
+                (let [snippet (parsers/remove-html-tags (:snippet doc))
+                      time (clj-format/parse (:time doc))]
+                  (indexer/insert (assoc doc :time time :snippet snippet))
+                  "ok")
+                  )}))
 
 (defresource insert-document []
              :allowed-methods [:post :options]
@@ -68,9 +71,9 @@
           (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,PUT,POST,DELETE,OPTIONS")
           (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control")))))
 
-(def application (-> routes  
+(def application (-> routes
                      ;(wrap-trace :header :ui);it can cause problems with big data
-                     wrap-params 
+                     wrap-params
                      allow-cross-origin))
 
 (defn- start [port]

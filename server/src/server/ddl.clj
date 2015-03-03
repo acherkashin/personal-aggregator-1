@@ -9,7 +9,7 @@
 (def docs-unique
   "CREATE UNIQUE INDEX docs_unq ON docs (url);")
 
-(defn drop-schema [] 
+(defn drop-schema []
   (exec-raw "drop schema public cascade;"))
 
 (defn create-schema []

@@ -11,6 +11,7 @@
                  [liberator "0.12.2"]
                  [cheshire "5.4.0"]
                  [clj-time "0.9.0"]
+                 [hickory "0.5.4"]
                  [korma "0.4.0"]
                  [org.postgresql/postgresql "9.2-1002-jdbc4"]]
   :plugins [[lein-ring "0.8.13"]]
@@ -19,7 +20,7 @@
 
   :main ^:skip-aot server.handler
   :uberjar-name "server.jar"
-  :profiles {:uberjar {:aot :all} 
+  :profiles {:uberjar {:aot :all}
              :dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                                   [ring-mock "0.1.5"]]}}
   )
