@@ -18,7 +18,7 @@
 
 (def search-results (atom []))
 
-(def text-for-search (atom "доллар"))
+(def text-for-search (atom ""))
 
 (defn search-handler [response]
   (let [results (map #(clojure.walk/keywordize-keys %) response)]
